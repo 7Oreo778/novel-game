@@ -6,6 +6,6 @@ React + TypeScript で制作中のノベルゲームです。
 バニラJSで作成したノベルゲームを React + TypeScript 環境へ移植・リファクタリングするプロジェクトです。
 
 ## 開発環境
-- React
-- TypeScript
-- Vite
+- React: 19.2.8
+- TypeScript: 6.0.2
+- Vite: 8.2.2
