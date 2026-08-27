@@ -43,36 +43,33 @@ export default function App() {
 
   // --- タイピングアニメーション処理（副作用フック） ---
   // 第二引数の [currentIndex] が変化した時（＝次のセリフに進んだ時）に自動実行される
+// --- タイピングアニメーション処理（最適化版） ---
   useEffect(() => {
-    // 安全装置: データが存在しなければ何もしない
     if (!current) return;
 
-    let charIndex = 0; // 現在何文字目まで出力したかをカウントする変数
-    setDisplayText(""); // 表示用テキストを一旦空リセット
-    setIsTyping(true);   // タイピング中フラグを ON にする
+    let charIndex = 0;
+    setDisplayText("");
+    setIsTyping(true);
 
-    // もし過去のタイマーが動いていたら念のため停止（連打時の重複防止）
     if (timerId.current) clearInterval(timerId.current);
 
-    // 50ミリ秒ごとに1文字ずつ文字を増やすタイマーを開始
-    timerId.current = setInterval(() => {
+    // 50ms → 40ms 程度に調整し、画面描画の周期と馴染ませる
+    timerId.current = window.setInterval(() => {
       charIndex++;
       
-      // セリフの文字数以下の場合は文字を切り出して画面用Stateを更新
-      if (charIndex <= current.text.length) {
-        setDisplayText(current.text.slice(0, charIndex));
-      } else {
-        // 全文字の出力が終わったらタイピング完了処理
-        setIsTyping(false); // タイピング中フラグを OFF
-        if (timerId.current) clearInterval(timerId.current); // タイマー停止
-      }
-    }, 50);
+      // 文字列の切り出し処理を軽量化
+      setDisplayText(current.text.slice(0, charIndex));
 
-    // クリーンアップ関数: コンポーネントが破棄されたり、次のセリフに移る際にタイマーを自動破棄
+      if (charIndex >= current.text.length) {
+        setIsTyping(false);
+        if (timerId.current) clearInterval(timerId.current);
+      }
+    }, 40); 
+
     return () => {
       if (timerId.current) clearInterval(timerId.current);
     };
-  }, [currentIndex]); // currentIndex（セリフ番号）が書き換わるたびにこの全処理が再実行される
+  }, [currentIndex]);
 
   // --- イベントハンドラー（画面クリック時の進行制御） ---
   const handleNext = () => {
@@ -93,7 +90,8 @@ export default function App() {
 
   // --- 画面の描画（JSX） ---
   return (
-    <div id="game-container" onClick={handleNext}>
+    // translate="no" を追加！　翻訳しないように！
+    <div id="game-container" translate="no" onClick={handleNext}>
       
       {/* 1. 立ち絵の表示処理 */}
       {current.mode === 'split' && (

@@ -96,5 +96,19 @@
         /* 角丸や枠線を消してスッキリさせる */
         border: none;
         z-index: 2; /* キャラクターより手前に表示 */
+
+        /* 高さを固定して縦揺れを防ぐ */
+        height: 120px; /* お好みの高さに調整してください */
+        box-sizing: border-box;
+    }
+    #message {
+      /* 等幅フォントを指定して文字幅ズレ（横揺れ）を防ぐ */
+      font-family: "Courier New", Consolas, "Mplus 1m", monospace;
+      
+      /* 行高を固定 */
+      line-height: 1.6;
+      
+      /* 文字が端にきたときに単語単位で変に改行されるのを防ぐ */
+      word-break: break-all;
     }
     #speaker { font-weight: bold; color: #70d6ff; margin-bottom: 5px; }
