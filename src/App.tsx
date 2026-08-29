@@ -39,6 +39,10 @@ export default function App() {
   const timerId = useRef<number | null>(null);         // タイマー記憶用
   // 再生速度の状態（初期値は 1.0）
   const [speed, setSpeed] = useState<number>(1.0);
+  // 再生中の Audio インスタンスを保持する ref
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // // 複数の Audio インスタンスを配列で保持する
+  // const audioRefs = useRef<HTMLAudioElement[]>([]);
 
   // シナリオの終了判定（配列の範囲を超えたか）
   const isEnd = currentIndex >= scenario.length;
@@ -73,20 +77,31 @@ export default function App() {
     useEffect(() => {
       const currentVoice = scenario[currentIndex]?.voice;
 
+      // 前の音声が残っていれば停止＆破棄
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+
       if (!currentVoice) return;
 
-      if (Array.isArray(currentVoice)) {
-        currentVoice.forEach((src) => {
-          const audio = new Audio(src);
-          audio.playbackRate = speed; // ★ stateの速度を反映
-          audio.play().catch((e) => console.log("再生エラー:", e));
-        });
-      } else {
+      // 単体ボイスの場合の例（※配列による同時再生がない場合）
+      if (typeof currentVoice === "string") {
         const audio = new Audio(currentVoice);
-        audio.playbackRate = speed; // ★ stateの速度を反映
+        audio.playbackRate = speed; // 現在の速度を適用
         audio.play().catch((e) => console.log("再生エラー:", e));
+
+        // ref に現在の Audio を保持
+        audioRef.current = audio;
       }
-    }, [currentIndex]); // currentIndex が変わった時に再生
+    }, [currentIndex]); // ★ ここは currentIndex のみに戻す！
+
+    // 速度（speed）変更時に、再生中の音声スピードだけをリアルタイム更新する
+    useEffect(() => {
+      if (audioRef.current) {
+        audioRef.current.playbackRate = speed;
+      }
+    }, [speed]);
 
   // --- イベントハンドラー ---
   // 画面を進める処理
