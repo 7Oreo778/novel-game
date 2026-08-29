@@ -39,10 +39,8 @@ export default function App() {
   const timerId = useRef<number | null>(null);         // タイマー記憶用
   // 再生速度の状態（初期値は 1.0）
   const [speed, setSpeed] = useState<number>(1.0);
-  // 再生中の Audio インスタンスを保持する ref
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  // // 複数の Audio インスタンスを配列で保持する
-  // const audioRefs = useRef<HTMLAudioElement[]>([]);
+  // 複数の Audio インスタンスを配列で保持する
+  const audioRefs = useRef<HTMLAudioElement[]>([]);
 
   // シナリオの終了判定（配列の範囲を超えたか）
   const isEnd = currentIndex >= scenario.length;
@@ -73,35 +71,35 @@ export default function App() {
     };
   }, [currentIndex]);
 
-  // --- 2. ボイス再生処理 ---
-    useEffect(() => {
-      const currentVoice = scenario[currentIndex]?.voice;
+// --- 1. ボイス再生処理（currentIndex 変更時） ---
+  useEffect(() => {
+    // 再生中の全音声を停止＆破棄
+    audioRefs.current.forEach((audio) => audio.pause());
+    audioRefs.current = [];
 
-      // 前の音声が残っていれば停止＆破棄
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+    const currentVoice = scenario[currentIndex]?.voice;
+    if (!currentVoice) return;
 
-      if (!currentVoice) return;
+    // 単体でも配列でも一括処理できるように配列化する
+    const voiceList = Array.isArray(currentVoice) ? currentVoice : [currentVoice];
 
-      // 単体ボイスの場合の例（※配列による同時再生がない場合）
-      if (typeof currentVoice === "string") {
-        const audio = new Audio(currentVoice);
-        audio.playbackRate = speed; // 現在の速度を適用
-        audio.play().catch((e) => console.log("再生エラー:", e));
+    voiceList.forEach((src) => {
+      const audio = new Audio(src);
+      audio.playbackRate = speed;
+      audio.play().catch((e) => console.log("再生エラー:", e));
 
-        // ref に現在の Audio を保持
-        audioRef.current = audio;
-      }
-    }, [currentIndex]); // ★ ここは currentIndex のみに戻す！
+      // 配列に追加して保持
+      audioRefs.current.push(audio);
+    });
+  }, [currentIndex]);
 
-    // 速度（speed）変更時に、再生中の音声スピードだけをリアルタイム更新する
-    useEffect(() => {
-      if (audioRef.current) {
-        audioRef.current.playbackRate = speed;
-      }
-    }, [speed]);
+  // --- 2. リアルタイム速度変更処理（speed 変更時） ---
+  useEffect(() => {
+    // 再生中のすべての音声の速度を一括変更
+    audioRefs.current.forEach((audio) => {
+      audio.playbackRate = speed;
+    });
+  }, [speed]);
 
   // --- イベントハンドラー ---
   // 画面を進める処理
