@@ -23,7 +23,8 @@ type Scenario = {
 
 // シナリオデータ本体
 const scenario: Scenario[] = [
-  // ナレーションは mode も active も省略してスッキリ！
+  // 画面をクリックさせるための開始ページ（voice は指定しない）
+  { name: "", text: "画面をクリックしてスタート" },
   { name: "", text: "物語が始まる……", voice: voice00 },
   { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left", voice: voice01 },
   { name: "ずんだもん", text: "めたん！こんにちはなのだ！", mode: "split", active: "right", voice: voice02 },
