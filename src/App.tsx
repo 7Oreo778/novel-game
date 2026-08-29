@@ -1,23 +1,33 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import doraImg from './assets/dora.webp';
-import kiroImg from './assets/kiro.webp';
-import fullImg from './assets/full.webp'; // 1枚絵画像を読み込み
+// 画像の読み込み
+import doraImg from './assets/images/characters/dora.webp';
+import kiroImg from './assets/images/characters/kiro.webp';
+import fullImg from './assets/images/characters/full.webp';
+
+// ボイスの読み込み（今回追加！）
+import voice00 from './assets/audio/voices/000_narr_intro.mp3';
+import voice01 from './assets/audio/voices/001_metan_greet.mp3';
+import voice02 from './assets/audio/voices/002_zunda_greet.mp3';
+import voice03m from './assets/audio/voices/003_metan_both.mp3';
+import voice03z from './assets/audio/voices/004_zunda_both.mp3';
 
 // シナリオデータの型定義
 type Scenario = {
   name: string;
   text: string;
-  mode: 'full' | 'split' | 'none';
-  active: 'left' | 'right' | 'both';
+  mode?: 'full' | 'split' | 'none';             // ? をつければ書かなくてもOKになる
+  active?: 'left' | 'right' | 'both' | 'none';  // ? をつければ書かなくてもOKになる
+  voice?: string | string[]; // 単体、または配列で指定可能にする
 };
 
 // シナリオデータ本体
 const scenario: Scenario[] = [
-  { name: "ナレーション", text: "物語が始まる……", mode: "full", active: "both" },
-  { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left" },
-  { name: "ずんだもん", text: "めたん！こんにちはなのだ！", mode: "split", active: "right" },
-  { name: "全員", text: "2人同時に喋るときは両方明るくもできるのだ！", mode: "split", active: "both" }
+  // ナレーションは mode も active も省略してスッキリ！
+  { name: "", text: "物語が始まる……", voice: voice00 },
+  { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left", voice: voice01 },
+  { name: "ずんだもん", text: "めたん！こんにちはなのだ！", mode: "split", active: "right", voice: voice02 },
+  { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
 ];
 
 export default function App() {
@@ -55,6 +65,22 @@ export default function App() {
       if (timerId.current) clearInterval(timerId.current);
     };
   }, [currentIndex]);
+
+  // --- 2. ボイス再生処理 ---
+    useEffect(() => {
+      const currentVoice = scenario[currentIndex]?.voice;
+      if (!currentVoice) return;
+
+      if (Array.isArray(currentVoice)) {
+        currentVoice.forEach((src) => {
+          const audio = new Audio(src);
+          audio.play().catch((e) => console.log("再生エラー:", e));
+        });
+      } else {
+        const audio = new Audio(currentVoice);
+        audio.play().catch((e) => console.log("再生エラー:", e));
+      }
+    }, [currentIndex]);
 
   // --- イベントハンドラー ---
   // 画面を進める処理

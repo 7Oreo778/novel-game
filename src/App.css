@@ -10,7 +10,6 @@
         overflow: hidden;    /* 画面枠からはみ出た画像や要素をカットして隠す */
 
         background-color: #222;    /* 背景画像が読み込まれるまでの暗い下地色 */
-        background-image: url('images/jimusho.webp');    /* 背景として表示する画像ファイル */
         background-size: cover;    /* 背景画像を枠全体に隙間なくピッタリ覆う */
         background-position: center;    /* 背景画像を中心の位置に合わせて配置する */
 
@@ -20,8 +19,7 @@
         user-select: none;    /* 画面クリック時に文字や画像が青く選択されないようにする */
 
         /* App.css から見た assets フォルダへのパス */
-        background-image: url('./assets/jimusho.webp');
-        /* ↑バニラJSでは書いてない。その他の設定はそのまま... */
+        background-image: url('./assets/images/backgrounds/jimusho.webp');
     }
 
     /* ==========================================
