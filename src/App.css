@@ -81,6 +81,23 @@
     #reset-btn:hover {
         background: rgba(255, 255, 255, 0.3);
     }
+    .speed-button {
+        position: absolute;
+        top: 16px;
+        /* right: 16px; */
+        z-index: 100;
+        padding: 6px 12px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 1px solid #ffffff66;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .speed-button:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
     #message-box {
         text-align: left; /* Viteの初期CSS（App.css や index.css）に含まれている「文字を中央揃えにする設定（text-align: center）」が邪魔をしているため追加 */
         position: absolute;

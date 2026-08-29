@@ -37,6 +37,8 @@ export default function App() {
   const [displayText, setDisplayText] = useState("");   // 画面に出す文字
   const [isTyping, setIsTyping] = useState(false);     // タイピング中フラグ
   const timerId = useRef<number | null>(null);         // タイマー記憶用
+  // 再生速度の状態（初期値は 1.0）
+  const [speed, setSpeed] = useState<number>(1.0);
 
   // シナリオの終了判定（配列の範囲を超えたか）
   const isEnd = currentIndex >= scenario.length;
@@ -70,18 +72,21 @@ export default function App() {
   // --- 2. ボイス再生処理 ---
     useEffect(() => {
       const currentVoice = scenario[currentIndex]?.voice;
+
       if (!currentVoice) return;
 
       if (Array.isArray(currentVoice)) {
         currentVoice.forEach((src) => {
           const audio = new Audio(src);
+          audio.playbackRate = speed; // ★ stateの速度を反映
           audio.play().catch((e) => console.log("再生エラー:", e));
         });
       } else {
         const audio = new Audio(currentVoice);
+        audio.playbackRate = speed; // ★ stateの速度を反映
         audio.play().catch((e) => console.log("再生エラー:", e));
       }
-    }, [currentIndex]);
+    }, [currentIndex]); // currentIndex が変わった時に再生
 
   // --- イベントハンドラー ---
   // 画面を進める処理
@@ -108,11 +113,26 @@ export default function App() {
     setCurrentIndex(0);
   };
 
+  // 速度を切り替える関数
+  const toggleSpeed = (e: React.MouseEvent) => {
+    // 画面全体のクリックイベント（セリフ送りの処理）に波及しないように止める
+    e.stopPropagation();
+
+    setSpeed((prevSpeed) => {
+      if (prevSpeed === 1.0) return 1.5;
+      if (prevSpeed === 1.5) return 2.0;
+      return 1.0;
+    });
+  };
+
   // --- 画面描画（JSX） ---
   return (
     <div id="game-container" translate="no" onClick={handleNext}>
       {/* 最初からボタン */}
       <button id="reset-btn" onClick={handleReset}>最初から</button>
+      <button className="speed-button" onClick={toggleSpeed}>
+          {speed.toFixed(1)}x
+        </button>
 
       {/* シナリオ進行中の表示 */}
       {current && (
