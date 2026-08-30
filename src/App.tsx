@@ -27,7 +27,7 @@ const scenario: Scenario[] = [
   { name: "", text: "画面をクリックしてスタート" },
   { name: "", text: "物語が始まる……", voice: voice00 },
   { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left", voice: voice01 },
-  { name: "ずんだもん", text: "めたん！こんにちはなのだ！", mode: "split", active: "right", voice: voice02 },
+  { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。何でも薄暗いじめじめした所でまめまめ泣いていた事だけは記憶している。", mode: "split", active: "right", voice: voice02 },
   { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
 ];
 
