@@ -13,12 +13,18 @@ import voice03m from './assets/audio/voices/003_metan_both.mp3';
 import voice03z from './assets/audio/voices/004_zunda_both.mp3';
 
 // シナリオデータの型定義
+type VoiceConfig = { //API
+  text: string;      // 喋らせたいテキスト
+  speakerId: number; // VOICEVOXのキャラID（ずんだもん=3, めたん=2 など）
+};
+
 type Scenario = {
   name: string;
   text: string;
   mode?: 'full' | 'split' | 'none';             // ? をつければ書かなくてもOKになる
   active?: 'left' | 'right' | 'both' | 'none';  // ? をつければ書かなくてもOKになる
-  voice?: string | string[]; // 単体、または配列で指定可能にする
+  // voice に mp3パス（単体/配列）または API用設定 を指定できるようにする
+  voice?: string | string[] | VoiceConfig;
 };
 
 // シナリオデータ本体
@@ -27,8 +33,11 @@ const scenario: Scenario[] = [
   { name: "", text: "画面をクリックしてスタート" },
   { name: "", text: "物語が始まる……", voice: voice00 },
   { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left", voice: voice01 },
-  { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。何でも薄暗いじめじめした所でまめまめ泣いていた事だけは記憶している。", mode: "split", active: "right", voice: voice02 },
+  { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。", mode: "split", active: "right", voice: voice02 },
   { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
+  // ★ ここからAPIでのリアルタイム音声生成！
+  { name: "ずんだもん", text: "ここからはAPIでの音声入力なのだ！", voice: { text: "ここからはエーピーアイでの音声入力なのだ！", speakerId: 3 } },
+  { name: "四国めたん", text: "あら、voicesフォルダにmp3を入れないと自分以外は聞けないから忘れないようにね", voice: { text: "あら、ボイシーズフォルダにエムピースリーを入れないと自分以外は聞けないから忘れないようにね", speakerId: 2 } },
 ];
 
 export default function App() {
@@ -45,6 +54,37 @@ export default function App() {
   // シナリオの終了判定（配列の範囲を超えたか）
   const isEnd = currentIndex >= scenario.length;
   const current = !isEnd ? scenario[currentIndex] : null;
+
+  // ★ ここに playVoiceFromApi を配置！
+  const playVoiceFromApi = async (text: string, speakerId: number = 3) => {
+    try {
+      const queryRes = await fetch(
+        `http://localhost:50021/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
+        { method: "POST" }
+      );
+      const queryData = await queryRes.json();
+
+      const synthRes = await fetch(
+        `http://localhost:50021/synthesis?speaker=${speakerId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(queryData),
+        }
+      );
+
+      const blob = await synthRes.blob();
+      const audioUrl = URL.createObjectURL(blob);
+
+      const audio = new Audio(audioUrl);
+      audio.playbackRate = speed;
+      audio.play();
+
+      audioRefs.current.push(audio);
+    } catch (error) {
+      console.error("VOICEVOX APIとの通信に失敗しました:", error);
+    }
+  }
 
   // --- タイピングアニメーション処理（useEffect） ---
   useEffect(() => {
@@ -74,21 +114,25 @@ export default function App() {
 // --- 1. ボイス再生処理（currentIndex 変更時） ---
   useEffect(() => {
     // 再生中の全音声を停止＆破棄
-    audioRefs.current.forEach((audio) => audio.pause());
+    audioRefs.current.forEach((a) => a.pause());
     audioRefs.current = [];
 
     const currentVoice = scenario[currentIndex]?.voice;
     if (!currentVoice) return;
 
-    // 単体でも配列でも一括処理できるように配列化する
+    // --- パターンA: APIを使う設定の場合 ---
+    if (typeof currentVoice === "object" && !Array.isArray(currentVoice)) {
+      playVoiceFromApi(currentVoice.text, currentVoice.speakerId);
+      return;
+    }
+
+    // --- パターンB: MP3ファイル（単体または配列）の場合 ---
     const voiceList = Array.isArray(currentVoice) ? currentVoice : [currentVoice];
 
     voiceList.forEach((src) => {
       const audio = new Audio(src);
       audio.playbackRate = speed;
       audio.play().catch((e) => console.log("再生エラー:", e));
-
-      // 配列に追加して保持
       audioRefs.current.push(audio);
     });
   }, [currentIndex]);
