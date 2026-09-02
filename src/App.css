@@ -89,11 +89,14 @@
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
+/* ホバー時は背景色を「濃い青」に完全に変える！ */
 .control-menu button:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background-color: #0056b3; /* 鮮やかすぎない青（例: ロイヤルブルー系の濃い色） */
+    border-color: #007bff;     /* 枠線も少し明るい青にして強調する */
+    color: white;              /* 文字は白のまま維持 */
 }
 
 /* ==========================================

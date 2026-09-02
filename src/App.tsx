@@ -174,6 +174,22 @@ export default function App() {
     });
   };
 
+  // 1つ前のセリフに戻る処理
+  const handleBack = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 画面全体のクリックイベント（文字を進める処理）が暴発するのを防ぐ
+    if (currentIndex <= 0) return; // 最初の一言目より前には戻せない
+
+    // 現在鳴っている音声を止める
+    audioRefs.current.forEach((a) => {
+      a.pause();
+      a.currentTime = 0;
+    });
+    audioRefs.current = [];
+
+    // currentIndexを1減らす
+    setCurrentIndex((prev) => prev - 1);
+  };
+
   return (
     <div id="game-container" translate="no" onClick={handleNext}>
       <Menu 
@@ -181,6 +197,7 @@ export default function App() {
         onReset={handleReset} 
         onToggleSpeed={toggleSpeed} 
         onReplay={handleReplay}
+        onBack={handleBack}
       />
 
       {current && (
