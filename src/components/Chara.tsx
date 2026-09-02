@@ -6,17 +6,14 @@ type Props = {
   kiroImg: string;
 };
 
-export const CharacterArea = ({ mode, active, fullImg, doraImg, kiroImg }: Props) => {
+export default function Chara({ mode, active, fullImg, doraImg, kiroImg }: Props) {
   if (!mode || mode === 'none') return null;
 
   return (
     <>
-      {/* 1枚絵（full）モード */}
       {mode === 'full' && (
         <img className="character chara-center" src={fullImg} alt="一枚絵" />
       )}
-
-      {/* 立ち絵2分割（split）モード */}
       {mode === 'split' && (
         <>
           <img
@@ -33,4 +30,4 @@ export const CharacterArea = ({ mode, active, fullImg, doraImg, kiroImg }: Props
       )}
     </>
   );
-};
+}

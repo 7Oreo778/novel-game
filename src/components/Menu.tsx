@@ -1,12 +1,11 @@
-import React from 'react';
-
 type Props = {
   speed: number;
   onReset: (e: React.MouseEvent) => void;
   onToggleSpeed: (e: React.MouseEvent) => void;
 };
 
-export const ControlMenu = ({ speed, onReset, onToggleSpeed }: Props) => {
+// 先頭に default をつける！
+export default function Menu({ speed, onReset, onToggleSpeed }: Props) {
   return (
     <div className="control-menu">
       <button id="reset-btn" onClick={onReset}>最初から</button>
@@ -15,4 +14,4 @@ export const ControlMenu = ({ speed, onReset, onToggleSpeed }: Props) => {
       </button>
     </div>
   );
-};
+}
