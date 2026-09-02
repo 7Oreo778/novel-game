@@ -20,37 +20,47 @@ export default function App() {
   const isEnd = currentIndex >= scenario.length;
   const current = !isEnd ? scenario[currentIndex] : null;
 
-  // VOICEVOX API呼び出し関数
-  const playVoiceFromApi = async (text: string, speakerId: number = 3) => {
-    try {
-      const queryRes = await fetch(
-        `http://localhost:50021/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
-        { method: "POST" }
-      );
-      const queryData = await queryRes.json();
+  // VOICEVOX API呼び出し関数（音量ブースト対応）
+    const playVoiceFromApi = async (text: string, speakerId: number = 3) => {
+      try {
+        const queryRes = await fetch(
+          `http://localhost:50021/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
+          { method: "POST" }
+        );
+        const queryData = await queryRes.json();
 
-      const synthRes = await fetch(
-        `http://localhost:50021/synthesis?speaker=${speakerId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(queryData),
-        }
-      );
+        const synthRes = await fetch(
+          `http://localhost:50021/synthesis?speaker=${speakerId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(queryData),
+          }
+        );
 
-      const blob = await synthRes.blob();
-      const audioUrl = URL.createObjectURL(blob);
+        const blob = await synthRes.blob();
+        const audioUrl = URL.createObjectURL(blob);
 
-      const audio = new Audio(audioUrl);
-      audio.playbackRate = speed;
-      audio.play();
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = speed;
 
-      audioRefs.current.push(audio);
-    } catch (error) {
-      console.error("VOICEVOX APIとの通信に失敗しました:", error);
-    }
-  };
+        // Web Audio APIを使って音量を強制的に増幅（1.5倍〜2.0倍などお好みで調整）
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(audio);
+        const gainNode = audioCtx.createGain();
+        
+        gainNode.gain.value = 1.8; // ← ここで音量を大きく！ (1.0で等倍)
+        
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
 
+        audio.play();
+        audioRefs.current.push(audio);
+      } catch (error) {
+        console.error("VOICEVOX APIとの通信に失敗しました:", error);
+      }
+    };
+    
   // タイピングアニメーション処理
   useEffect(() => {
     if (!current) return;
@@ -99,6 +109,36 @@ export default function App() {
     });
   }, [currentIndex]);
 
+  // 音声をもう一度再生する処理（既存の音声を止めてから再生）
+    const handleReplay = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!current) return;
+
+      // 1. まず現在流れている音声をすべて一時停止してリセットする
+      audioRefs.current.forEach((a) => {
+        a.pause();
+        a.currentTime = 0;
+      });
+      audioRefs.current = [];
+
+      const currentVoice = current.voice;
+      if (!currentVoice) return;
+
+      // 2. 従来通り再生
+      if (typeof currentVoice === "object" && !Array.isArray(currentVoice)) {
+        playVoiceFromApi(currentVoice.text, currentVoice.speakerId);
+        return;
+      }
+
+      const voiceList = Array.isArray(currentVoice) ? currentVoice : [currentVoice];
+      voiceList.forEach((src) => {
+        const audio = new Audio(src);
+        audio.playbackRate = speed;
+        audio.play().catch((e) => console.log("再生エラー:", e));
+        audioRefs.current.push(audio);
+      });
+    };
+
   // 速度変更処理
   useEffect(() => {
     audioRefs.current.forEach((audio) => {
@@ -140,6 +180,7 @@ export default function App() {
         speed={speed} 
         onReset={handleReset} 
         onToggleSpeed={toggleSpeed} 
+        onReplay={handleReplay}
       />
 
       {current && (

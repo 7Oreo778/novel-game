@@ -39,5 +39,5 @@ export const scenario: Scenario[] = [
   { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。", mode: "split", active: "right", voice: voice02 },
   { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
   { name: "ずんだもん", text: "ここからはAPIでの音声入力なのだ！", voice: { text: "ここからはエーピーアイでの音声入力なのだ！", speakerId: 3 } },
-  { name: "四国めたん", text: "あら、voicesフォルダにmp3を入れないと自分以外は聞けないから忘れないようにね", voice: { text: "あら、ボイシーズフォルダにエムピースリーを入れないと自分以外は聞けないから忘れないようにね.", speakerId: 2 } },
+  { name: "四国めたん", text: "あら、VOICEVOXを起動しておかないと声は出ないわよ。あとvoicesフォルダにmp3を入れないと自分以外は聞けないから忘れないようにね。", voice: { text: "あら、ボイスボックスを起動しておかないと声は出ないわよ。あとボイシーズフォルダにエムピースリーを入れないと自分以外は聞けないから忘れないようにね.", speakerId: 2 } },
 ];

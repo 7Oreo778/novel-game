@@ -1,129 +1,126 @@
 /* ==========================================
     ゲームコンテナ（16:9 レスポンシブ設定）
     ========================================== */
-    #game-container {
-        position: relative;    /* 子要素（キャラや文章枠）を絶対配置するための基準にする */
-        width: 100%;    /* 親要素に合わせて横幅を100%伸縮させる */
-        max-width: 1280px;    /* 横幅が1280px以上にならないよう上限を設ける */
-        aspect-ratio: 16 / 9;    /* 画面の比率を常に16:9に自動維持する */
-        margin: 0 auto;    /* 画面が大きくなったときに中央寄せにして左右に余白を作る */
-        overflow: hidden;    /* 画面枠からはみ出た画像や要素をカットして隠す */
+#game-container {
+    position: relative;    /* 子要素（キャラや文章枠）を絶対配置するための基準にする */
+    width: 100%;    /* 親要素に合わせて横幅を100%伸縮させる */
+    max-width: 1280px;    /* 横幅が1280px以上にならないよう上限を設ける */
+    aspect-ratio: 16 / 9;    /* 画面の比率を常に16:9に自動維持する */
+    margin: 0 auto;    /* 画面が大きくなったときに中央寄せにして左右に余白を作る */
+    overflow: hidden;    /* 画面枠からはみ出た画像や要素をカットして隠す */
 
-        background-color: #222;    /* 背景画像が読み込まれるまでの暗い下地色 */
-        background-size: cover;    /* 背景画像を枠全体に隙間なくピッタリ覆う */
-        background-position: center;    /* 背景画像を中心の位置に合わせて配置する */
+    background-color: #222;    /* 背景画像が読み込まれるまでの暗い下地色 */
+    background-size: cover;    /* 背景画像を枠全体に隙間なくピッタリ覆う */
+    background-position: center;    /* 背景画像を中心の位置に合わせて配置する */
 
-        color: white;    /* 枠内の基本文字色を白にする */
-        font-family: sans-serif;    /* 枠内のフォントをゴシック体（標準）にする */
-        cursor: pointer;    /* マウスカーソルを重ねたときにポインター（指マーク）にする */
-        user-select: none;    /* 画面クリック時に文字や画像が青く選択されないようにする */
+    color: white;    /* 枠内の基本文字色を白にする */
+    font-family: sans-serif;    /* 枠内のフォントをゴシック体（標準）にする */
+    cursor: pointer;    /* マウスカーソルを重ねたときにポインター（指マーク）にする */
+    user-select: none;    /* 画面クリック時に文字や画像が青く選択されないようにする */
 
-        /* App.css から見た assets フォルダへのパス */
-        background-image: url('./assets/images/backgrounds/jimusho.webp');
-    }
+    /* App.css から見た assets フォルダへのパス */
+    background-image: url('./assets/images/backgrounds/jimusho.webp');
+}
 
-    /* ==========================================
+/* ==========================================
     キャラクター立ち絵（共通設定）
     ========================================== */
-    .character {
-        position: absolute;    /* ゲーム画面を基準にして自由な位置に重ねて配置する */
-        bottom: 0;    /* キャラクターの足元を画面の一番下にピッタリ合わせる */
-        z-index: 1;    /* 背景より手前、メッセージ枠より奥の層に表示する */
-        pointer-events: none;    /* キャラ画像をクリックしても下の画面にクリックを通す */
-        width: auto;    /* 縦横比（アスペクト比）を崩さずに横幅を自動計算する */
-        transition: filter 0.3s ease, opacity 0.3s ease;    /* 表情変化や明暗の切り替えを滑らかにする */
-    }
+.character {
+    position: absolute;    /* ゲーム画面を基準にして自由な位置に重ねて配置する */
+    bottom: 0;    /* キャラクターの足元を画面の一番下にピッタリ合わせる */
+    z-index: 1;    /* 背景より手前、メッセージ枠より奥の層に表示する */
+    pointer-events: none;    /* キャラ画像をクリックしても下の画面にクリックを通す */
+    width: auto;    /* 縦横比（アスペクト比）を崩さずに横幅を自動計算する */
+    transition: filter 0.3s ease, opacity 0.3s ease;    /* 表情変化や明暗の切り替えを滑らかにする */
+}
 
-    /* ==========================================
+/* ==========================================
     立ち絵位置・サイズ個別設定
     ========================================== */
 
-    /* 1枚絵（full.webp 用） */
-    .chara-center {
-        left: 50%;    /* 画面の左から50%（中央）の位置に配置する */
-        transform: translateX(-50%);    /* 画像自身の幅の半分だけ左に戻して完璧な中央に寄せる */
-        height: 85%;    /* 画面の縦幅に対して85%の高さで表示する */
-        bottom: 10%;
-    }
+/* 1枚絵（full.webp 用） */
+.chara-center {
+    left: 50%;    /* 画面の左から50%（中央）の位置に配置する */
+    transform: translateX(-50%);    /* 画像自身の幅の半分だけ左に戻して完璧な中央に寄せる */
+    height: 85%;    /* 画面の縦幅に対して85%の高さで表示する */
+    bottom: 10%;
+}
 
-    /* 左配置：ドラゴン（dora.webp） */
-    .chara-left {
-        left: 25%;    /* 画面の左から25%の位置に基準点を置く */
-        transform: translateX(-50%);    /* 画像の中心軸を基準点に重ねて位置を安定させる */
-        height: 50%;    /* 画面の縦幅に対して50%の小さめサイズで表示する */
-        bottom: 20%;    /* 足元を画面下から20%浮かせて宙に浮いた状態にする */
-    }
+/* 左配置：ドラゴン（dora.webp） */
+.chara-left {
+    left: 25%;    /* 画面の左から25%の位置に基準点を置く */
+    transform: translateX(-50%);    /* 画像の中心軸を基準点に重ねて位置を安定させる */
+    height: 50%;    /* 画面の縦幅に対して50%の小さめサイズで表示する */
+    bottom: 20%;    /* 足元を画面下から20%浮かせて宙に浮いた状態にする */
+}
 
-    /* 右配置：人間（kiro.webp） */
-    .chara-right {
-        right: 20%;    /* 画面の右から20%の位置に基準点を置く */
-        transform: translate(25%, 10%);    /* X軸（右へ25%）とY軸（下へ10%）の位置補正を同時に行う */
-        height: 80%;    /* 画面の縦幅に対して80%の大きさで表示する */
-        bottom: 17%;    /* 足元を画面下から17%上げて位置を微調整する */
-    }
-    /* 喋っていない方を暗くする用クラス */
-    .character.inactive {
-        filter: brightness(0.5); /* 明度を50%に落とす */
-        transition: filter 0.3s ease; /* 0.3秒かけてヌッと暗く/明るくする */
-    }
-    #reset-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 10; /* 手前に表示 */
-        padding: 6px 12px;
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-        border: 1px solid #fff;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    #reset-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-    .speed-button {
-        position: absolute;
-        top: 16px;
-        right: 120px;
-        z-index: 100;
-        padding: 6px 12px;
-        background-color: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        border: 1px solid #ffffff66;
-        border-radius: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .speed-button:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-    #message-box {
-        text-align: left; /* Viteの初期CSS（App.css や index.css）に含まれている「文字を中央揃えにする設定（text-align: center）」が邪魔をしているため追加 */
-        position: absolute;
-        bottom: 20px;
-        left: 5%;
-        width: 90%;
-        padding: 20px;
-        box-sizing: border-box;
-        /* 背景：上から下にかけて半透明の黒グラデーション */
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
-        /* 角丸や枠線を消してスッキリさせる */
-        border: none;
-        z-index: 2; /* キャラクターより手前に表示 */
+/* 右配置：人間（kiro.webp） */
+.chara-right {
+    right: 20%;    /* 画面の右から20%の位置に基準点を置く */
+    transform: translate(25%, 10%);    /* X軸（右へ25%）とY軸（下へ10%）の位置補正を同時に行う */
+    height: 80%;    /* 画面の縦幅に対して80%の大きさで表示する */
+    bottom: 17%;    /* 足元を画面下から17%上げて位置を微調整する */
+}
+/* 喋っていない方を暗くする用クラス */
+.character.inactive {
+    filter: brightness(0.5); /* 明度を50%に落とす */
+    transition: filter 0.3s ease; /* 0.3秒かけてヌッと暗く/明るくする */
+}
 
-        /* 高さを固定して縦揺れを防ぐ */
-        height: 120px; /* お好みの高さに調整してください */
-        box-sizing: border-box;
-    }
-    #message {
-      /* 等幅フォントを指定して文字幅ズレ（横揺れ）を防ぐ */
-      font-family: "Courier New", Consolas, "Mplus 1m", monospace;
-      
-      /* 行高を固定 */
-      line-height: 1.6;
-      
-      /* 文字が端にきたときに単語単位で変に改行されるのを防ぐ */
-      word-break: break-all;
-    }
-    #speaker { font-weight: bold; color: #70d6ff; margin-bottom: 5px; }
+/* ==========================================
+    右上コントロールメニュー（ボタンまとめ用）
+    ========================================== */
+.control-menu {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* ボタン同士の隙間をあける */
+    z-index: 100;
+}
+
+/* メニュー内のボタン共通デザイン */
+.control-menu button {
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.control-menu button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+    メッセージボックス
+    ========================================== */
+#message-box {
+    text-align: left; 
+    position: absolute;
+    bottom: 20px;
+    left: 5%;
+    width: 90%;
+    padding: 20px;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
+    border: none;
+    z-index: 2; 
+    height: 120px; 
+}
+
+#message {
+  font-family: "Courier New", Consolas, "Mplus 1m", monospace;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+#speaker { 
+    font-weight: bold; 
+    color: #70d6ff; 
+    margin-bottom: 5px; 
+}
