@@ -1,30 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import './App.css';
 
-// 外に追い出したデータと画像をインポート
+// データとコンポーネントのインポート
 import { scenario, images } from './data/scenario';
-
-// コンポーネントのインポート
 import Menu from './components/Menu';
 import Chara from './components/Chara';
 import TextBox from './components/TextBox';
 
-export default function App() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const timerId = useRef<number | null>(null);
-  const [speed, setSpeed] = useState<number>(1.0);
+// Zustand と Custom Hooks のインポート
+import { useGameStore } from './store/gameStore';
+import { useTypewriter } from './hooks/useTypewriter';
 
-  // 鳴っている音声を管理するRef
+export default function App() {
+  // Zustand ストアから状態とアクションを取得
+  const { currentIndex, speed, next, back, reset, setSpeed } = useGameStore();
+
   const audioRefs = useRef<HTMLAudioElement[]>([]);
-  // ★追加：APIで生成した音声を一時保存しておくキャッシュ（辞書）
   const voiceCache = useRef<{ [key: string]: string }>({});
 
   const isEnd = currentIndex >= scenario.length;
   const current = !isEnd ? scenario[currentIndex] : null;
 
-  // ★追加：次のセリフにAPI音声があれば、裏でこっそり先読み（プリロード）する
+  // タイピングカスタムフックの呼び出し
+  const { displayText, isTyping, skipTyping } = useTypewriter(current ? current.text : "");
+
+  // 次のセリフの音声プリロード
   useEffect(() => {
     const nextIndex = currentIndex + 1;
     if (nextIndex < scenario.length) {
@@ -32,7 +32,6 @@ export default function App() {
       if (nextItem && nextItem.voice && typeof nextItem.voice === "object" && !Array.isArray(nextItem.voice)) {
         const { text, speakerId = 3 } = nextItem.voice;
         
-        // まだキャッシュにない場合だけ裏でフェッチする
         if (!voiceCache.current[text]) {
           fetch(
             `http://localhost:50021/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
@@ -56,12 +55,11 @@ export default function App() {
     }
   }, [currentIndex]);
 
-  // VOICEVOX API呼び出し関数（キャッシュ対応＆音量ブースト版）
+  // VOICEVOX API呼び出し関数
   const playVoiceFromApi = async (text: string, speakerId: number = 3) => {
     try {
       let audioUrl = voiceCache.current[text];
 
-      // キャッシュにない場合は通常通りAPIを叩いてキャッシュに保存する
       if (!audioUrl) {
         const queryRes = await fetch(
           `http://localhost:50021/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
@@ -86,13 +84,10 @@ export default function App() {
       const audio = new Audio(audioUrl);
       audio.playbackRate = speed;
 
-      // Web Audio APIを使って音量を強制的に増幅
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioCtx.createMediaElementSource(audio);
       const gainNode = audioCtx.createGain();
-      
       gainNode.gain.value = 1.8; // 音量ブースト
-      
       source.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
@@ -102,31 +97,6 @@ export default function App() {
       console.error("VOICEVOX APIとの通信に失敗しました:", error);
     }
   };
-    
-  // タイピングアニメーション処理
-  useEffect(() => {
-    if (!current) return;
-
-    let charIndex = 0;
-    setDisplayText("");
-    setIsTyping(true);
-
-    if (timerId.current) clearInterval(timerId.current);
-
-    timerId.current = window.setInterval(() => {
-      charIndex++;
-      if (charIndex <= current.text.length) {
-        setDisplayText(current.text.slice(0, charIndex));
-      } else {
-        setIsTyping(false);
-        if (timerId.current) clearInterval(timerId.current);
-      }
-    }, 40);
-
-    return () => {
-      if (timerId.current) clearInterval(timerId.current);
-    };
-  }, [currentIndex]);
 
   // 音声再生処理
   useEffect(() => {
@@ -145,7 +115,6 @@ export default function App() {
     }
 
     const voiceList = Array.isArray(currentVoice) ? currentVoice : [currentVoice];
-
     voiceList.forEach((src) => {
       const audio = new Audio(src);
       audio.playbackRate = speed;
@@ -154,7 +123,44 @@ export default function App() {
     });
   }, [currentIndex]);
 
-  // 音声をもう一度再生する処理（既存の音声を止めてから再生）
+  // 速度変更時の反映
+  useEffect(() => {
+    audioRefs.current.forEach((audio) => {
+      audio.playbackRate = speed;
+    });
+  }, [speed]);
+
+  // 画面クリック時のハンドラー
+  const handleNext = () => {
+    if (isEnd) return;
+
+    // タイピング中なら一瞬で全文を表示する
+    if (isTyping) {
+      skipTyping();
+      return;
+    }
+
+    // 音声を止めて次へ
+    audioRefs.current.forEach((a) => {
+      a.pause();
+      a.currentTime = 0;
+    });
+    audioRefs.current = [];
+
+    next();
+  };
+
+  // メニュー用ハンドラー群
+  const handleReset = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    audioRefs.current.forEach((a) => {
+      a.pause();
+      a.currentTime = 0;
+    });
+    audioRefs.current = [];
+    reset();
+  };
+
   const handleReplay = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!current) return;
@@ -182,47 +188,6 @@ export default function App() {
     });
   };
 
-  // 速度変更処理
-  useEffect(() => {
-    audioRefs.current.forEach((audio) => {
-      audio.playbackRate = speed;
-    });
-  }, [speed]);
-
-  const handleNext = () => {
-    if (isEnd) return;
-
-    if (isTyping && current) {
-      if (timerId.current) clearInterval(timerId.current);
-      setDisplayText(current.text);
-      setIsTyping(false);
-      return;
-    }
-
-    setCurrentIndex((prev) => prev + 1);
-  };
-
-  const handleReset = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (timerId.current) clearInterval(timerId.current);
-    audioRefs.current.forEach((a) => {
-      a.pause();
-      a.currentTime = 0;
-    });
-    audioRefs.current = [];
-    setCurrentIndex(0);
-  };
-
-  const toggleSpeed = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSpeed((prevSpeed) => {
-      if (prevSpeed === 1.0) return 1.5;
-      if (prevSpeed === 1.5) return 2.0;
-      return 1.0;
-    });
-  };
-
-  // 1つ前のセリフに戻る処理
   const handleBack = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (currentIndex <= 0) return;
@@ -233,7 +198,14 @@ export default function App() {
     });
     audioRefs.current = [];
 
-    setCurrentIndex((prev) => prev - 1);
+    back();
+  };
+
+  const toggleSpeed = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (speed === 1.0) setSpeed(1.5);
+    else if (speed === 1.5) setSpeed(2.0);
+    else setSpeed(1.0);
   };
 
   return (
