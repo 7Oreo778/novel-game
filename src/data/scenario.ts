@@ -112,7 +112,10 @@ export const scenario: Scenario[] = [
   { 
     name: "", 
     text: "これ以上深追いするのはやめておこう。二人は無事に街へ戻り、平穏な日常を取り戻した。\n【日常エンド：END A】",
-    voice: { text: "これいじょうふかおいするのはやめておこう。ふたりはぶじにまちにもどり、へいおんなにちじょうをとりもどした。", speakerId: 9 }
+    voice: { text: "これいじょうふかおいするのはやめておこう。ふたりはぶじにまちにもどり、へいおんなにちじょうをとりもどした。", speakerId: 9 },
+    choices: [
+      { text: "最初に戻る", nextIndex: 0 }
+    ]
   },
   // [15] 奥へ進んで鍵をゲット
   { 
@@ -125,15 +128,18 @@ export const scenario: Scenario[] = [
   { 
     name: "", 
     text: "道を進むと、先ほど見た「禍々しい洞窟」の入り口へと繋がっていた。どうする？",
-    voice: { text: "みちをすすむと、さきほどみたまがまがしいどうくつのいりぐちへとつながっていた。どうする？", speakerId: 9 }
+    voice: { text: "みちをすすむと、さきほどみたまがまがしいどうくつのいりぐちへとつながっていた。どうする？", speakerId: 9 },
+    choices: [
+      { text: "街へ戻る", nextIndex: 17 },
+      { text: "禍々しい洞窟へ入る", nextIndex: 18 }
+    ]
   },
   { 
     name: "", 
     text: "冒険はここまでにして、街へ戻ることにした。平穏な日常が一番だね。\n【日常エンド：END C】",
     voice: { text: "ぼうけんはここまでにして、まちにもどることにした。へいおんななちじょうがいちばんだね。", speakerId: 9 },
     choices: [
-      { text: "街へ戻る", nextIndex: 17 },
-      { text: "禍々しい洞窟へ入る", nextIndex: 18 }
+      { text: "最初に戻る", nextIndex: 0 }
     ]
   },
   { 
@@ -142,10 +148,45 @@ export const scenario: Scenario[] = [
     voice: { text: "ふたたびどうくつはいり、れいのかぎのまえにやってきた。さて、どうやってあけようか……？", speakerId: 9 }
   },
 
-  // === 【宝箱の解放・エンディング分岐】 ===
+  // === 【宝箱の解放・所持アイテムによる分岐エンド】 (index 19) ===あとで所持フラグをつける！
   {
     name: "",
-    text: "持ってきたアイテムやこれまでの選択によって、宝箱の運命が変わる……！",
-    voice: { text: "もってきたあいてむやこれまでのせんたくによって、たからばこのうんめいがかわる……！", speakerId: 3 }
+    text: "持ってきたアイテムやこれまでの選択によって、行動が変わる……！",
+    voice: { text: "もってきたあいてむやこれまでのせんたくによって、こうどうがかわる……！", speakerId: 9 },
+    choices: [
+      { text: "りんごを試す", nextIndex: 20, flagName: "openAttempt", flagValue: "apple" },
+      { text: "バールでこじ開ける", nextIndex: 21, flagName: "openAttempt", flagValue: "crowbar" },
+      { text: "古い鍵を使う", nextIndex: 22, flagName: "openAttempt", flagValue: "key" }
+    ]
+  },
+
+  // [20] りんごEND
+  {
+    name: "",
+    text: "宝箱の裏に何故かりんごをはめることができ、中から大量のお宝とりんごジュースが出てきた！\n【りんごEND】",
+    voice: { text: "たからばこのうらになぜかりんごをはめることができ、なかからたいりょうのおたからとりんごじゅーすがでてきた！りんごえんど", speakerId: 3 },
+    choices: [
+      { text: "最初に戻る", nextIndex: 0 }
+    ]
+  },
+
+  // [21] バールEND
+  {
+    name: "",
+    text: "ゴリ押しでバールを鍵穴に突っ込み、力任せにこじ開けた！バキバキに壊れたが中からお宝ザクザクだ！\n【バールEND】",
+    voice: { text: "ごりおしでばーるをかぎあなにをつっこみ、ちからまかせにこじあけた！ばきばきにこわれたがなかからおたからざくざくだ！ばーるえんど。", speakerId: 2 },
+    choices: [
+      { text: "最初に戻る", nextIndex: 0 }
+    ]
+  },
+
+  // [22] 鍵END
+  {
+    name: "",
+    text: "最奥で見つけた「古い鍵」を差し込むと、カチリと音を立てて完璧に宝箱が開いた！中には眩い秘宝が眠っていた。\n【鍵END】",
+    voice: { text: "さいおうで見つけたふるいかぎをさしこむと、かちりとおとをたててかんぺきにたからばこがひらいた！なかにはまばゆいひほうが眠っていた。かぎえんど。", speakerId: 9 },
+    choices: [
+      { text: "最初に戻る", nextIndex: 0 }
+    ]
   }
 ];
