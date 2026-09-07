@@ -49,15 +49,15 @@ export const scenario: Scenario[] = [
   { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。", mode: "split", active: "right", voice: voice02 },
   { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
   
-  // ★ここに分岐用の選択肢テストを追加
+  // シナリオデータ本体の該当部分
   { 
     name: "システム", 
     text: "ここで分岐の選択肢が発生するのだ！どうする？", 
     choices: [
-      { text: "右の道をいく", nextIndex: 5, flagName: "wentRight", flagValue: true },
-      { text: "左の道をいく", nextIndex: 6, flagName: "wentRight", flagValue: false }
+      { text: "右の道をいく", nextIndex: 6, flagName: "wentRight", flagValue: true },  // ★index 6へジャンプ
+      { text: "左の道をいく", nextIndex: 7, flagName: "wentRight", flagValue: false } // ★index 7へジャンプ
     ]
   },
-  { name: "ずんだもん", text: "右の道を選んだ世界線なのだ！", voice: { text: "右の道を選んだ世界線なのだ！", speakerId: 3 } },
-  { name: "四国めたん", text: "左の道を選んだわけね。", voice: { text: "左の道を選んだわけね。", speakerId: 2 } },
+  { name: "ずんだもん", text: "右の道を選んだ世界線なのだ！", voice: { text: "右の道を選んだ世界線なのだ！", speakerId: 3 } }, // index 6
+  { name: "四国めたん", text: "左の道を選んだわけね。", voice: { text: "左の道を選んだわけね。", speakerId: 2 } }, // index 7
 ];

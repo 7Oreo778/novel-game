@@ -1,17 +1,13 @@
-import type { Choice } from '../data/scenario'; // 型のみをインポートする場合は `import type` を使うルールへの対応
+import type { Choice } from '../data/scenario';
 import { useGameStore } from '../store/gameStore';
 
-// コンポーネントが受け取るプロパティの型定義
 type Props = {
-  choices: Choice[]; // シナリオデータから渡される選択肢の配列
+  choices: Choice[];
 };
 
-/**
- * 選択肢を表示・選択するためのコンポーネント
- */
 export default function ChoicesBox({ choices }: Props) {
-  // Zustandストアから、指定インデックスへのジャンプとフラグを更新する関数を取得
   const jumpTo = useGameStore((state) => state.jumpTo);
+  const currentIndex = useGameStore((state) => state.currentIndex); // 現在のインデックスも確認用に追加
 
   return (
     <div className="choices-container">
@@ -20,8 +16,11 @@ export default function ChoicesBox({ choices }: Props) {
           key={index}
           className="choice-button"
           onClick={(e) => {
-            e.stopPropagation(); // 画面全体のクリックイベント（背景クリックでの次へ進む等）が暴発するのを防ぐ
-            // 選択肢に設定されたジャンプ先インデックスと、フラグ名・値をストアに渡す
+            e.stopPropagation();
+            console.log(`選択肢クリック: 「${choice.text}」が押されました。index ${currentIndex} から ${choice.nextIndex} へジャンプします`);
+            console.log(`セットするフラグ:`, choice.flagName, choice.flagValue);
+            
+            // 実際にジャンプを実行
             jumpTo(choice.nextIndex, choice.flagName, choice.flagValue);
           }}
         >

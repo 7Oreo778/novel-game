@@ -4,24 +4,24 @@ import { scenario } from '../data/scenario';
 type GameState = {
   currentIndex: number;
   speed: number;
-  flags: { [key: string]: boolean }; // フラグ管理用の辞書
+  flags: { [key: string]: boolean };
   next: () => void;
   back: () => void;
   reset: () => void;
   setSpeed: (speed: number) => void;
   setCurrentIndex: (index: number) => void;
-  jumpTo: (index: number, flagName?: string, flagValue?: boolean) => void; // 特定の場所へ飛ぶ＆フラグを立てる
+  jumpTo: (index: number, flagName?: string, flagValue?: boolean) => void;
+  saveGame: () => void; // ★セーブ関数
+  loadGame: () => void; // ★ロード関数
 };
 
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   currentIndex: 0,
   speed: 1.0,
   flags: {},
 
-  // 次へ進む
   next: () =>
     set((state) => {
-      // 現在のコマに選択肢がある場合は、勝手に次に進めないようにする
       const currentItem = scenario[state.currentIndex];
       if (currentItem && currentItem.choices && currentItem.choices.length > 0) {
         return state; 
@@ -33,7 +33,6 @@ export const useGameStore = create<GameState>((set) => ({
       return state;
     }),
 
-  // 1つ戻る
   back: () =>
     set((state) => {
       if (state.currentIndex > 0) {
@@ -42,16 +41,12 @@ export const useGameStore = create<GameState>((set) => ({
       return state;
     }),
 
-  // 最初からリセット
   reset: () => set({ currentIndex: 0, flags: {} }),
 
-  // 再生速度の切り替え
   setSpeed: (speed) => set({ speed }),
 
-  // インデックスの直接指定（セーブロード用など）
   setCurrentIndex: (index) => set({ currentIndex: index }),
 
-  // 選択肢を選んだときの処理（指定インデックスへジャンプ ＋ フラグ保存）
   jumpTo: (index, flagName, flagValue) =>
     set((state) => {
       const newFlags = { ...state.flags };
@@ -63,4 +58,28 @@ export const useGameStore = create<GameState>((set) => ({
         flags: newFlags,
       };
     }),
+
+  // ★現在の状態を localStorage に保存
+  saveGame: () => {
+    const { currentIndex, flags } = get();
+    const saveData = { currentIndex, flags };
+    localStorage.setItem('novel_game_save', JSON.stringify(saveData));
+    alert('セーブしました！');
+  },
+
+  // ★localStorage から状態を読み込み
+  loadGame: () => {
+    const savedData = localStorage.getItem('novel_game_save');
+    if (!savedData) {
+      alert('セーブデータが見つかりません');
+      return;
+    }
+    try {
+      const { currentIndex, flags } = JSON.parse(savedData);
+      set({ currentIndex, flags });
+      alert('ロードしました！');
+    } catch (e) {
+      console.error('セーブデータの読み込みに失敗しました', e);
+    }
+  },
 }));
