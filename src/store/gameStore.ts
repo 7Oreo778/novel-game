@@ -4,13 +4,13 @@ import { scenario } from '../data/scenario';
 type GameState = {
   currentIndex: number;
   speed: number;
-  flags: { [key: string]: boolean };
+  flags: { [key: string]: string | boolean }; // ★ここを string | boolean に変更！
   next: () => void;
   back: () => void;
   reset: () => void;
   setSpeed: (speed: number) => void;
   setCurrentIndex: (index: number) => void;
-  jumpTo: (index: number, flagName?: string, flagValue?: boolean) => void;
+  jumpTo: (index: number, flagName?: string, flagValue?: string | boolean) => void;
   saveGame: () => void; // ★セーブ関数
   loadGame: () => void; // ★ロード関数
 };
