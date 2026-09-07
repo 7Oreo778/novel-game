@@ -23,12 +23,22 @@ export type VoiceConfig = {
   speakerId: number;
 };
 
+// 選択肢の型
+export type Choice = {
+  text: string;           // 選択肢のボタンに表示するテキスト
+  nextIndex: number;      // 選んだ時にジャンプするシナリオのインデックス
+  flagName?: string;      // 任意：この選択肢で立つフラグの名前
+  flagValue?: boolean;    // 任意：そのフラグの値
+};
+
+// シナリオ1コマの型定義
 export type Scenario = {
   name: string;
   text: string;
   mode?: 'full' | 'split' | 'none';
   active?: 'left' | 'right' | 'both' | 'none';
   voice?: string | string[] | VoiceConfig;
+  choices?: Choice[];     // ★選択肢がある場合はここに追加
 };
 
 // シナリオデータ本体
@@ -38,6 +48,16 @@ export const scenario: Scenario[] = [
   { name: "四国めたん", text: "あら、こんにちはずんだもん。", mode: "split", active: "left", voice: voice01 },
   { name: "ずんだもん", text: "めたん！こんにちはなのだ！速度確認のために長文を喋るのだ！吾輩は豆である。名前はもう有る。どこで生れたかとんと見当がつかぬ。おそらく東北地方であろう。", mode: "split", active: "right", voice: voice02 },
   { name: "二人", text: "2人同時に喋るときは両方明るくできる！", mode: "split", active: "both", voice: [voice03m, voice03z] },
-  { name: "ずんだもん", text: "ここからはAPIでの音声入力なのだ！", voice: { text: "ここからはエーピーアイでの音声入力なのだ！", speakerId: 3 } },
-  { name: "四国めたん", text: "あら、VOICEVOXを起動しておかないと声は出ないわよ。あとvoicesフォルダにmp3を入れないと自分以外は聞けないから忘れないようにね。", voice: { text: "あら、ボイスボックスを起動しておかないと声は出ないわよ。あとボイシーズフォルダにエムピースリーを入れないと自分以外は聞けないから忘れないようにね.", speakerId: 2 } },
+  
+  // ★ここに分岐用の選択肢テストを追加
+  { 
+    name: "システム", 
+    text: "ここで分岐の選択肢が発生するのだ！どうする？", 
+    choices: [
+      { text: "右の道をいく", nextIndex: 5, flagName: "wentRight", flagValue: true },
+      { text: "左の道をいく", nextIndex: 6, flagName: "wentRight", flagValue: false }
+    ]
+  },
+  { name: "ずんだもん", text: "右の道を選んだ世界線なのだ！", voice: { text: "右の道を選んだ世界線なのだ！", speakerId: 3 } },
+  { name: "四国めたん", text: "左の道を選んだわけね。", voice: { text: "左の道を選んだわけね。", speakerId: 2 } },
 ];

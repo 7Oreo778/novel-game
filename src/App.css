@@ -127,3 +127,43 @@
     color: #70d6ff; 
     margin-bottom: 5px; 
 }
+
+/* 選択肢を格納するコンテナ：画面全体に重ねて、中央に縦並びで配置する */
+.choices-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column; /* 上下に並べる */
+  justify-content: center; /* 画面の上下中央に配置 */
+  align-items: center;     /* 画面の左右中央に配置 */
+  gap: 15px;               /* ボタン同士の間隔 */
+  z-index: 100;            /* メニューやテキストボックスより手前に表示する */
+  pointer-events: none;    /* コンテナ自体のクリックは透過させ、ボタンだけ押せるようにする */
+}
+
+/* 選択肢の個別ボタンのデザイン */
+.choice-button {
+  pointer-events: auto;    /* ボタン自体はクリック可能にする */
+  width: 350px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: rgba(20, 20, 30, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* マウスホバー時の演出 */
+.choice-button:hover {
+  background-color: rgba(40, 100, 180, 0.9);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+}

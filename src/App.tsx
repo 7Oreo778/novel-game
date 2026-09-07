@@ -6,6 +6,7 @@ import { scenario, images } from './data/scenario';
 import Menu from './components/Menu';
 import Chara from './components/Chara';
 import TextBox from './components/TextBox';
+import ChoicesBox from './components/ChoicesBox'; // ★追加：選択肢コンポーネントのインポート
 
 // Zustand と Custom Hooks のインポート
 import { useGameStore } from './store/gameStore';
@@ -134,6 +135,11 @@ export default function App() {
   const handleNext = () => {
     if (isEnd) return;
 
+    // ★もし現在のコマに選択肢が存在する場合は、画面クリックで先に進まないようにガードする
+    if (current && current.choices && current.choices.length > 0) {
+      return;
+    }
+
     // タイピング中なら一瞬で全文を表示する
     if (isTyping) {
       skipTyping();
@@ -232,6 +238,11 @@ export default function App() {
             speaker={current.name}
             displayText={displayText}
           />
+
+          {/* ★追加：選択肢が存在する場合にChoicesBoxを描画する */}
+          {current.choices && current.choices.length > 0 && (
+            <ChoicesBox choices={current.choices} />
+          )}
         </>
       )}
 
