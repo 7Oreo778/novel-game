@@ -1,3 +1,5 @@
+import styles from './Chara.module.css';
+
 type Props = {
   mode?: 'full' | 'split' | 'none';
   active?: 'left' | 'right' | 'both' | 'none';
@@ -12,17 +14,17 @@ export default function Chara({ mode, active, fullImg, doraImg, kiroImg }: Props
   return (
     <>
       {mode === 'full' && (
-        <img className="character chara-center" src={fullImg} alt="一枚絵" />
+        <img className={`${styles.character} ${styles.center}`} src={fullImg} alt="一枚絵" />
       )}
       {mode === 'split' && (
         <>
           <img
-            className={`character chara-left ${active === 'right' ? 'inactive' : ''}`}
+            className={`${styles.character} ${styles.left} ${active === 'right' ? styles.inactive : ''}`}
             src={doraImg}
             alt="左キャラ"
           />
           <img
-            className={`character chara-right ${active === 'left' ? 'inactive' : ''}`}
+            className={`${styles.character} ${styles.right} ${active === 'left' ? styles.inactive : ''}`}
             src={kiroImg}
             alt="右キャラ"
           />

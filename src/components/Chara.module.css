@@ -1,0 +1,35 @@
+/* src/components/Chara.module.css */
+.character {
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    width: auto;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.center {
+    left: 50%;
+    transform: translateX(-50%);
+    height: 85%;
+    bottom: 10%;
+}
+
+.left {
+    left: 25%;
+    transform: translateX(-50%);
+    height: 50%;
+    bottom: 20%;
+}
+
+.right {
+    right: 20%;
+    transform: translate(25%, 10%);
+    height: 80%;
+    bottom: 17%;
+}
+
+.inactive {
+    filter: brightness(0.5);
+    transition: filter 0.3s ease;
+}

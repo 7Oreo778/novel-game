@@ -1,3 +1,5 @@
+import styles from './TextBox.module.css';
+
 type Props = {
   speaker: string;
   displayText: string;
@@ -5,9 +7,9 @@ type Props = {
 
 export default function TextBox({ speaker, displayText }: Props) {
   return (
-    <div id="message-box">
-      <div id="speaker">{speaker}</div>
-      <div id="message">{displayText}</div>
+    <div className={styles.box}>
+      <div className={styles.speaker}>{speaker}</div>
+      <div className={styles.message}>{displayText}</div>
     </div>
   );
 }

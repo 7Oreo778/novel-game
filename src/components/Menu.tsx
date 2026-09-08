@@ -1,5 +1,6 @@
 import React from 'react';
-import { useGameStore } from '../store/gameStore'; // Zustandストアをインポート
+import { useGameStore } from '../store/gameStore';
+import styles from './Menu.module.css'; // ★追加
 
 type Props = {
   speed: number;
@@ -10,25 +11,20 @@ type Props = {
 };
 
 export default function Menu({ speed, onReset, onToggleSpeed, onReplay }: Props) {
-  // Zustandストアからセーブ・ロードの関数を取得
   const saveGame = useGameStore((state) => state.saveGame);
   const loadGame = useGameStore((state) => state.loadGame);
-
-  // 例：UIコンポーネント内などのボタン配置
   const toggleLog = useGameStore((state) => state.toggleLog);
 
   return (
-    <div className="control-menu">
-      <button onClick={toggleLog}>履歴</button>
-      {/* <button id="back-btn" onClick={onBack}>戻る</button> */}
-      <button id="replay-btn" onClick={onReplay}>もう一度</button>
-      <button className="speed-button" onClick={onToggleSpeed}>
+    <div className={styles.menu}>
+      <button className={styles.button} onClick={toggleLog}>履歴</button>
+      <button className={styles.button} onClick={onReplay}>もう一度</button>
+      <button className={styles.button} onClick={onToggleSpeed}>
         {speed.toFixed(1)}x
       </button>
       
-      {/* ★追加：セーブボタン（クリック時のイベントバブリングを防ぐ） */}
       <button 
-        id="save-btn" 
+        className={styles.button} 
         onClick={(e) => { 
           e.stopPropagation(); 
           saveGame(); 
@@ -37,9 +33,8 @@ export default function Menu({ speed, onReset, onToggleSpeed, onReplay }: Props)
         セーブ
       </button>
 
-      {/* ★追加：ロードボタン */}
       <button 
-        id="load-btn" 
+        className={styles.button} 
         onClick={(e) => { 
           e.stopPropagation(); 
           loadGame(); 
@@ -48,7 +43,7 @@ export default function Menu({ speed, onReset, onToggleSpeed, onReplay }: Props)
         ロード
       </button>
 
-      <button id="reset-btn" onClick={onReset}>最初から</button>
+      <button className={styles.button} onClick={onReset}>最初から</button>
     </div>
   );
 }
