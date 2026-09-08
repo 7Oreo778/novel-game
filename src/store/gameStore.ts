@@ -1,24 +1,37 @@
+// src/store/gameStore.ts
 import { create } from 'zustand';
 import { scenario } from '../data/scenario';
+
+type HistoryItem = {
+  name: string;
+  text: string;
+};
 
 type GameState = {
   currentIndex: number;
   speed: number;
-  flags: { [key: string]: string | boolean }; // ★ここを string | boolean に変更！
+  flags: { [key: string]: string | boolean };
+  history: HistoryItem[]; // ★履歴用配列
+  isLogOpen: boolean;     // ★ログ画面の開閉状態
   next: () => void;
   back: () => void;
   reset: () => void;
   setSpeed: (speed: number) => void;
   setCurrentIndex: (index: number) => void;
   jumpTo: (index: number, flagName?: string, flagValue?: string | boolean) => void;
-  saveGame: () => void; // ★セーブ関数
-  loadGame: () => void; // ★ロード関数
+  toggleLog: () => void;  // ★ログ画面の切り替え
+  saveGame: () => void;
+  loadGame: () => void;
 };
 
 export const useGameStore = create<GameState>((set, get) => ({
   currentIndex: 0,
   speed: 1.0,
   flags: {},
+  history: [
+    { name: scenario[0].name, text: scenario[0].text } // 初期テキストを登録
+  ],
+  isLogOpen: false,
 
   next: () =>
     set((state) => {
@@ -27,25 +40,36 @@ export const useGameStore = create<GameState>((set, get) => ({
         return state; 
       }
 
-      if (state.currentIndex < scenario.length) {
-        return { currentIndex: state.currentIndex + 1 };
+      if (state.currentIndex < scenario.length - 1) {
+        const nextIndex = state.currentIndex + 1;
+        const nextItem = scenario[nextIndex];
+        return {
+          currentIndex: nextIndex,
+          // 履歴に追加（名前とテキスト）
+          history: [...state.history, { name: nextItem.name, text: nextItem.text }]
+        };
       }
       return state;
     }),
 
-  back: () =>
-    set((state) => {
-      if (state.currentIndex > 0) {
-        return { currentIndex: state.currentIndex - 1 };
-      }
-      return state;
-    }),
+  back: () => set((state) => state), // 複雑になるため巻き戻しは無効化、または削除してOKです
 
-  reset: () => set({ currentIndex: 0, flags: {} }),
+  reset: () => set({ 
+    currentIndex: 0, 
+    flags: {}, 
+    history: [{ name: scenario[0].name, text: scenario[0].text }] 
+  }),
 
   setSpeed: (speed) => set({ speed }),
 
-  setCurrentIndex: (index) => set({ currentIndex: index }),
+  setCurrentIndex: (index) => 
+    set((state) => {
+      const targetItem = scenario[index];
+      return {
+        currentIndex: index,
+        history: targetItem ? [...state.history, { name: targetItem.name, text: targetItem.text }] : state.history
+      };
+    }),
 
   jumpTo: (index, flagName, flagValue) =>
     set((state) => {
@@ -53,21 +77,22 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (flagName) {
         newFlags[flagName] = flagValue ?? true;
       }
+      const targetItem = scenario[index];
       return {
         currentIndex: index,
         flags: newFlags,
+        history: targetItem ? [...state.history, { name: targetItem.name, text: targetItem.text }] : state.history
       };
     }),
 
-  // ★現在の状態を localStorage に保存
+  toggleLog: () => set((state) => ({ isLogOpen: !state.isLogOpen })),
+
   saveGame: () => {
-    const { currentIndex, flags } = get();
-    const saveData = { currentIndex, flags };
-    localStorage.setItem('novel_game_save', JSON.stringify(saveData));
+    const { currentIndex, flags, history } = get();
+    localStorage.setItem('novel_game_save', JSON.stringify({ currentIndex, flags, history }));
     alert('セーブしました！');
   },
 
-  // ★localStorage から状態を読み込み
   loadGame: () => {
     const savedData = localStorage.getItem('novel_game_save');
     if (!savedData) {
@@ -75,11 +100,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
     try {
-      const { currentIndex, flags } = JSON.parse(savedData);
-      set({ currentIndex, flags });
+      const { currentIndex, flags, history } = JSON.parse(savedData);
+      set({ currentIndex, flags, history: history || [] });
       alert('ロードしました！');
     } catch (e) {
-      console.error('セーブデータの読み込みに失敗しました', e);
+      console.error('読み込み失敗', e);
     }
   },
 }));
