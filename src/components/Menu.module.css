@@ -1,12 +1,54 @@
 /* src/components/Menu.module.css */
-.menu {
+.menuContainer {
     position: absolute;
     top: 15px;
     right: 15px;
     display: flex;
+    flex-direction: row-reverse; /* ★右側（ハンバーガー）を起点にして左側にメニューを広げる */
     align-items: center;
     gap: 10px;
     z-index: 100;
+}
+
+/* 3本線のハンバーガーボタン */
+.hamburgerButton {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    flex-shrink: 0; /* ★ボタンのサイズが縮まないように固定 */
+}
+
+.hamburgerButton:hover {
+    background-color: rgba(0, 86, 179, 0.8);
+}
+
+.bar {
+    width: 22px;
+    height: 2px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+/* 展開されたメニューリスト */
+.menuList {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background: rgba(20, 20, 30, 0.9);
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .button {
@@ -17,6 +59,7 @@
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
+    white-space: nowrap;
     transition: background-color 0.2s, border-color 0.2s;
 }
 
