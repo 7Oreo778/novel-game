@@ -15,7 +15,7 @@ import { useTypewriter } from './hooks/useTypewriter';
 
 export default function App() {
   // Zustand ストアから状態とアクションを取得
-  const { currentIndex, speed, next, reset, setSpeed } = useGameStore();
+  const { currentIndex, speed, next, reset, setSpeed, isAuto } = useGameStore();
 
   const audioRefs = useRef<HTMLAudioElement[]>([]);
   const voiceCache = useRef<{ [key: string]: string }>({});
@@ -131,6 +131,34 @@ export default function App() {
       audio.playbackRate = speed;
     });
   }, [speed]);
+
+  // ★オートモードによる自動進行処理
+  useEffect(() => {
+    // オートがOFFのとき、またはすでに終端のときは何もしない
+    if (!isAuto || isEnd) return;
+
+    // 選択肢が出ているときは勝手に進まないように止める
+    if (current && current.choices && current.choices.length > 0) {
+      return;
+    }
+
+    // タイピング中（isTyping）や、音声再生中のウェイトを考慮して
+    // 「テキスト表示が完了してから一定時間（例: 2秒）」経過したら次へ進む
+    if (!isTyping) {
+      const timer = setTimeout(() => {
+        // 次へ進む前に音声を止める処理（handleNextと同じ安全策）
+        audioRefs.current.forEach((a) => {
+          a.pause();
+          a.currentTime = 0;
+        });
+        audioRefs.current = [];
+
+        next();
+      }, 2000); // 読ませたい秒数（2000ミリ秒 = 2秒）
+
+      return () => clearTimeout(timer);
+    }
+  }, [isAuto, isTyping, currentIndex, isEnd, current, next]);
 
   // 画面クリック時のハンドラー
   const handleNext = () => {

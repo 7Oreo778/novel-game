@@ -11,15 +11,17 @@ type GameState = {
   currentIndex: number;
   speed: number;
   flags: { [key: string]: string | boolean };
-  history: HistoryItem[]; // ★履歴用配列
-  isLogOpen: boolean;     // ★ログ画面の開閉状態
+  history: HistoryItem[];
+  isLogOpen: boolean;
+  isAuto: boolean;        // ★オートモードの状態
   next: () => void;
   back: () => void;
   reset: () => void;
   setSpeed: (speed: number) => void;
   setCurrentIndex: (index: number) => void;
   jumpTo: (index: number, flagName?: string, flagValue?: string | boolean) => void;
-  toggleLog: () => void;  // ★ログ画面の切り替え
+  toggleLog: () => void;
+  toggleAuto: () => void; // ★オートモードの切り替え関数
   saveGame: () => void;
   loadGame: () => void;
 };
@@ -29,9 +31,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   speed: 1.0,
   flags: {},
   history: [
-    { name: scenario[0].name, text: scenario[0].text } // 初期テキストを登録
+    { name: scenario[0].name, text: scenario[0].text }
   ],
   isLogOpen: false,
+  isAuto: false, // ★初期値はOFF
 
   next: () =>
     set((state) => {
@@ -45,14 +48,13 @@ export const useGameStore = create<GameState>((set, get) => ({
         const nextItem = scenario[nextIndex];
         return {
           currentIndex: nextIndex,
-          // 履歴に追加（名前とテキスト）
           history: [...state.history, { name: nextItem.name, text: nextItem.text }]
         };
       }
       return state;
     }),
 
-  back: () => set((state) => state), // 複雑になるため巻き戻しは無効化、または削除してOKです
+  back: () => set((state) => state),
 
   reset: () => set({ 
     currentIndex: 0, 
@@ -86,6 +88,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     }),
 
   toggleLog: () => set((state) => ({ isLogOpen: !state.isLogOpen })),
+
+  toggleAuto: () => set((state) => ({ isAuto: !state.isAuto })), // ★オート切り替えのアクション
 
   saveGame: () => {
     const { currentIndex, flags, history } = get();

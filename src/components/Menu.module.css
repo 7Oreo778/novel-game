@@ -25,3 +25,8 @@
     border-color: #007bff;
     color: white;
 }
+
+.activeAuto {
+    background-color: #0056b3;
+    border-color: #007bff;
+}
