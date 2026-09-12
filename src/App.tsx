@@ -269,9 +269,9 @@ export default function App() {
         <button 
           className="screen-btn" 
           style={{ padding: '6px 12px', fontSize: '14px' }} 
-          onClick={(e) => { e.stopPropagation(); setScreen('title'); }}
+          onClick={(e) => { e.stopPropagation(); setScreen('storySelect'); }}
         >
-          タイトルへ
+          章選択へ
         </button>
       </div>
 
