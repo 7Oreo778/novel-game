@@ -1,8 +1,9 @@
 /* ==========================================
-    ゲームコンテナ（16:9 レスポンシブ設定）
+    ゲームコンテナ ＆ 画面共通コンテナ（16:9 レスポンシブ設定）
     ========================================== */
-#game-container {
-    position: relative;    /* 子要素（キャラや文章枠）を絶対配置するための基準にする */
+#game-container,
+.screen-container {
+    position: relative;    /* 子要素を絶対配置するための基準にする */
     width: 100%;    /* 親要素に合わせて横幅を100%伸縮させる */
     max-width: 1280px;    /* 横幅が1280px以上にならないよう上限を設ける */
     aspect-ratio: 16 / 9;    /* 画面の比率を常に16:9に自動維持する */
@@ -15,36 +16,43 @@
 
     color: white;    /* 枠内の基本文字色を白にする */
     font-family: sans-serif;    /* 枠内のフォントをゴシック体（標準）にする */
-    cursor: pointer;    /* マウスカーソルを重ねたときにポインター（指マーク）にする */
-    user-select: none;    /* 画面クリック時に文字や画像が青く選択されないようにする */
+    user-select: none;    /* 画面クリック時に文字や画像が選択されないようにする */
 
-    /* App.css から見た assets フォルダへのパス */
+    /* デフォルトの背景（事務所など） */
     background-image: url('./assets/images/backgrounds/jimusho.webp');
 }
 
+/* ゲームコンテナ専用の設定（クリック判定用カーソルなど） */
+#game-container {
+    cursor: pointer;
+}
+
+/* タイトル・ストーリー選択・ガチャ画面用のフレックス配置 */
 .screen-container {
-    width: 100vw;
-    height: 100vh;
-    background: #1a1a1a;
-    color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    font-family: sans-serif;
 }
 
+/* ガチャ画面専用の背景色にしたい場合 */
+.gacha-bg {
+    background-color: #1a1111;
+}
+
+/* ボタンを並べるグループ */
 .button-group {
     display: flex;
     gap: 20px;
 }
 
+/* 画面内の共通ボタンデザイン */
 .screen-btn {
     padding: 12px 24px;
     font-size: 18px;
     font-weight: bold;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.6);
     color: white;
     border: 2px solid white;
     border-radius: 8px;
@@ -57,10 +65,7 @@
     transform: translateY(-2px);
 }
 
-.gacha-bg {
-    background: #311a1a;
-}
-
+/* ガチャを引くボタンの特別装飾 */
 .gacha-pull-btn {
     background: gold;
     color: black;
@@ -69,8 +74,22 @@
     padding: 20px 40px;
 }
 
+/* 戻るボタン */
 .back-btn {
     margin-top: 20px;
     font-size: 14px;
     padding: 8px 16px;
+}
+
+/* --- 各画面ごとの背景設定 --- */
+.title-bg {
+    background-image: url('./assets/images/backgrounds/rose.webp');
+}
+
+.story-select-bg {
+    background-image: url('./assets/images/backgrounds/apple.webp');
+}
+
+.gacha-bg {
+    background-image: url('./assets/images/backgrounds/popred.webp');
 }

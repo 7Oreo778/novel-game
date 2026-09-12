@@ -225,7 +225,7 @@ export default function App() {
   // --- ① タイトル画面 ---
   if (screen === 'title') {
     return (
-      <div className="screen-container">
+      <div className="screen-container title-bg">
         <h1>ノベルゲームタイトル</h1>
         <div className="button-group">
           <button className="screen-btn" onClick={() => setScreen('storySelect')}>ストーリー</button>
@@ -238,7 +238,7 @@ export default function App() {
   // --- ② ストーリー選択画面 ---
   if (screen === 'storySelect') {
     return (
-      <div className="screen-container">
+      <div className="screen-container story-select-bg">
         <h2>ストーリー選択</h2>
         <div className="button-group">
           <button className="screen-btn" onClick={() => { reset(); setScreen('game'); }}>第1章</button>
