@@ -7,7 +7,7 @@ import Menu from './components/Menu';
 import Chara from './components/Chara';
 import TextBox from './components/TextBox';
 import ChoicesBox from './components/ChoicesBox'; 
-import { LogModal } from './components/LogModal'; // ★追加：履歴モーダルのインポート
+import { LogModal } from './components/LogModal';
 
 // Zustand と Custom Hooks のインポート
 import { useGameStore } from './store/gameStore';
@@ -15,7 +15,7 @@ import { useTypewriter } from './hooks/useTypewriter';
 
 export default function App() {
   // Zustand ストアから状態とアクションを取得
-  const { currentIndex, speed, next, reset, setSpeed, isAuto } = useGameStore();
+  const { screen, setScreen, currentIndex, speed, next, reset, setSpeed, isAuto } = useGameStore();
 
   const audioRefs = useRef<HTMLAudioElement[]>([]);
   const voiceCache = useRef<{ [key: string]: string }>({});
@@ -89,7 +89,7 @@ export default function App() {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioCtx.createMediaElementSource(audio);
       const gainNode = audioCtx.createGain();
-      gainNode.gain.value = 1.8; // 音量ブースト
+      gainNode.gain.value = 1.8;
       source.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
@@ -132,21 +132,16 @@ export default function App() {
     });
   }, [speed]);
 
-  // ★オートモードによる自動進行処理
+  // オートモードによる自動進行処理
   useEffect(() => {
-    // オートがOFFのとき、またはすでに終端のときは何もしない
     if (!isAuto || isEnd) return;
 
-    // 選択肢が出ているときは勝手に進まないように止める
     if (current && current.choices && current.choices.length > 0) {
       return;
     }
 
-    // タイピング中（isTyping）や、音声再生中のウェイトを考慮して
-    // 「テキスト表示が完了してから一定時間（例: 2秒）」経過したら次へ進む
     if (!isTyping) {
       const timer = setTimeout(() => {
-        // 次へ進む前に音声を止める処理（handleNextと同じ安全策）
         audioRefs.current.forEach((a) => {
           a.pause();
           a.currentTime = 0;
@@ -154,7 +149,7 @@ export default function App() {
         audioRefs.current = [];
 
         next();
-      }, 2000); // 読ませたい秒数（2000ミリ秒 = 2秒）
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
@@ -220,19 +215,6 @@ export default function App() {
     });
   };
 
-  // const handleBack = (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   if (currentIndex <= 0) return;
-
-  //   audioRefs.current.forEach((a) => {
-  //     a.pause();
-  //     a.currentTime = 0;
-  //   });
-  //   audioRefs.current = [];
-
-  //   back();
-  // };
-
   const toggleSpeed = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (speed === 1.0) setSpeed(1.5);
@@ -240,14 +222,64 @@ export default function App() {
     else setSpeed(1.0);
   };
 
+  // --- ① タイトル画面 ---
+  if (screen === 'title') {
+    return (
+      <div className="screen-container">
+        <h1>ノベルゲームタイトル</h1>
+        <div className="button-group">
+          <button className="screen-btn" onClick={() => setScreen('storySelect')}>ストーリー</button>
+          <button className="screen-btn" onClick={() => setScreen('gacha')}>ガチャ</button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- ② ストーリー選択画面 ---
+  if (screen === 'storySelect') {
+    return (
+      <div className="screen-container">
+        <h2>ストーリー選択</h2>
+        <div className="button-group">
+          <button className="screen-btn" onClick={() => { reset(); setScreen('game'); }}>第1章</button>
+        </div>
+        <button className="screen-btn back-btn" onClick={() => setScreen('title')}>タイトルに戻る</button>
+      </div>
+    );
+  }
+
+  // --- ③ ガチャ画面 ---
+  if (screen === 'gacha') {
+    return (
+      <div className="screen-container gacha-bg">
+        <h2>ガチャ画面</h2>
+        <p>クリックしてガチャを引こう！</p>
+        <button className="screen-btn gacha-pull-btn" onClick={() => alert('SSRが出た！（仮演出）')}>
+          引く！
+        </button>
+        <button className="screen-btn back-btn" onClick={() => setScreen('title')}>タイトルに戻る</button>
+      </div>
+    );
+  }
+
+  // --- ④ ゲーム本編画面 ---
   return (
     <div id="game-container" translate="no" onClick={handleNext}>
+      <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 100 }}>
+        <button 
+          className="screen-btn" 
+          style={{ padding: '6px 12px', fontSize: '14px' }} 
+          onClick={(e) => { e.stopPropagation(); setScreen('title'); }}
+        >
+          タイトルへ
+        </button>
+      </div>
+
       <Menu 
         speed={speed} 
         onReset={handleReset} 
         onToggleSpeed={toggleSpeed} 
         onReplay={handleReplay}
-        // onBack={handleBack}
       />
 
       {current && (
@@ -259,12 +291,10 @@ export default function App() {
             doraImg={images.doraImg}
             kiroImg={images.kiroImg}
           />
-
           <TextBox
             speaker={current.name}
             displayText={displayText}
           />
-
           {current.choices && current.choices.length > 0 && (
             <ChoicesBox choices={current.choices} />
           )}
@@ -278,7 +308,6 @@ export default function App() {
         />
       )}
 
-      {/* ★ここに配置（ゲーム画面の上にポップアップとして重ねて表示するため） */}
       <LogModal />
     </div>
   );

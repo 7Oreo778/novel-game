@@ -21,3 +21,56 @@
     /* App.css から見た assets フォルダへのパス */
     background-image: url('./assets/images/backgrounds/jimusho.webp');
 }
+
+.screen-container {
+    width: 100vw;
+    height: 100vh;
+    background: #1a1a1a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-family: sans-serif;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+}
+
+.screen-btn {
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.screen-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.gacha-bg {
+    background: #311a1a;
+}
+
+.gacha-pull-btn {
+    background: gold;
+    color: black;
+    border-color: darkgoldenrod;
+    font-size: 22px;
+    padding: 20px 40px;
+}
+
+.back-btn {
+    margin-top: 20px;
+    font-size: 14px;
+    padding: 8px 16px;
+}

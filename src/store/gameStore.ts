@@ -7,13 +7,18 @@ type HistoryItem = {
   text: string;
 };
 
+// ★画面の状態を表す型を追加
+type ScreenState = 'title' | 'storySelect' | 'game' | 'gacha';
+
 type GameState = {
+  screen: ScreenState;    // ★現在の画面状態
   currentIndex: number;
   speed: number;
   flags: { [key: string]: string | boolean };
   history: HistoryItem[];
   isLogOpen: boolean;
-  isAuto: boolean;        // ★オートモードの状態
+  isAuto: boolean;
+  setScreen: (screen: ScreenState) => void; // ★画面を切り替える関数
   next: () => void;
   back: () => void;
   reset: () => void;
@@ -21,12 +26,13 @@ type GameState = {
   setCurrentIndex: (index: number) => void;
   jumpTo: (index: number, flagName?: string, flagValue?: string | boolean) => void;
   toggleLog: () => void;
-  toggleAuto: () => void; // ★オートモードの切り替え関数
+  toggleAuto: () => void;
   saveGame: () => void;
   loadGame: () => void;
 };
 
 export const useGameStore = create<GameState>((set, get) => ({
+  screen: 'title', // ★最初はタイトル画面からスタート
   currentIndex: 0,
   speed: 1.0,
   flags: {},
@@ -34,7 +40,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     { name: scenario[0].name, text: scenario[0].text }
   ],
   isLogOpen: false,
-  isAuto: false, // ★初期値はOFF
+  isAuto: false,
+
+  setScreen: (screen) => set({ screen }), // ★画面切り替えのアクション
 
   next: () =>
     set((state) => {
@@ -89,7 +97,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   toggleLog: () => set((state) => ({ isLogOpen: !state.isLogOpen })),
 
-  toggleAuto: () => set((state) => ({ isAuto: !state.isAuto })), // ★オート切り替えのアクション
+  toggleAuto: () => set((state) => ({ isAuto: !state.isAuto })),
 
   saveGame: () => {
     const { currentIndex, flags, history } = get();
